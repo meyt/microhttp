@@ -1,7 +1,7 @@
-from nanohttp import configure, Controller, thread_local
+from nanohttp import configure, Controller
 from os.path import abspath
-from microhttp.cli.main import MainLauncher
 from microhttp import exceptions
+import threading
 
 
 class BusInner:
@@ -13,7 +13,7 @@ class BusInner:
         return x
 
     def __setitem__(self, key, value):
-        self._items[key]=value
+        self._items[key] = value
 
     def __getitem__(self, item):
         return self._items[item]
@@ -27,25 +27,25 @@ class BusInner:
 
 class Bus:
 
-    @classmethod
-    def get_current(cls):
-        if not hasattr(thread_local, 'colony_bus'):
+    def get_current(self):
+        if not hasattr(self.thread_local, 'colony_bus'):
             raise exceptions.BusNotInitializedException('Bus not initialized')
         else:
-            return thread_local.colony_bus
+            return self.thread_local.colony_bus
 
     def __init__(self):
-        if not hasattr(thread_local, 'colony_bus'):
-            thread_local.colony_bus = BusInner()
+        self.thread_local = threading.local()
+        if not hasattr(self.thread_local, 'colony_bus'):
+            self.thread_local.colony_bus = BusInner()
 
     def __getattr__(self, key):
-        return getattr(thread_local.colony_bus, key)
+        return getattr(self.thread_local.colony_bus, key)
 
     def __setattr__(self, key, value):
-        setattr(thread_local.colony_bus, key, value)
+        setattr(self.thread_local.colony_bus, key, value)
 
     def __delattr__(self, key):
-        delattr(thread_local.colony_bus, key)
+        delattr(self.thread_local.colony_bus, key)
 
 
 class Application:
@@ -75,7 +75,6 @@ logging:
         self.name = name
         self.root = root
         self.root_path = abspath(root_path)
-        self.cli_main = MainLauncher(self)
 
     def configure(self, files=None, context=None, **kwargs):
         _context = {
