@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import scoped_session, sessionmaker, session as sa_session
 from microhttp import bus
 from nanohttp import settings
@@ -37,14 +37,17 @@ def commit(func):
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        result = func(*args, **kwargs)
-        try:
+        def commit_all_sessions():
             for session_alias, session in bus.ext.db.sessions.items():
-                session.commit()
-        except:
-            for session_alias, session in bus.ext.db.sessions.items():
-                if session.is_active:
+                try:
+                    session.commit()
+                except:
                     session.rollback()
-            raise
-        return result
+                    raise
+        try:
+            result = func(*args, **kwargs)
+            commit_all_sessions()
+            return result
+        except exc.StatementError:
+            commit_all_sessions()
     return wrapper
