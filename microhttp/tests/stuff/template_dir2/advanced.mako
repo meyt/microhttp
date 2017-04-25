@@ -1,2 +1,2 @@
-<%inherit file="master.mak"/>
+<%inherit file="master.mako"/>
 <%block name="description">today: ${today}</%block>
