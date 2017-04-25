@@ -42,21 +42,22 @@ class DogpileCacheSession:
         return item in self._session
 
     def __enter__(self):
+        self._session = {}
         if settings.session.cookie_name in context.cookies:
             self._session_id = context.cookies[settings.session.cookie_name]
         else:
             self._session_id = self.make_session_id()
             context.response_cookies.append(HttpCookie(name=settings.session.cookie_name,
                                                        value=self._session_id, http_only=True))
-        tmp = self.region.get('sessions')
-        if isinstance(tmp, dict) and self._session_id in tmp:
-            self._session = tmp[self._session_id]
+        tmp = self.region.get(self._session_id)
+        if isinstance(tmp, dict):
+            self._session = tmp
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.region.set('sessions', {self._session_id: self._session})
+        self.region.set(self._session_id, self._session)
 
-    def clear(self):
+    def clear(self):  # TODO
         pass
 
 
