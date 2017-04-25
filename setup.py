@@ -12,7 +12,7 @@ setup(
     keywords='nanohttp microhttp web tool-chain',
     packages=find_packages(),
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: POSIX :: Linux',
