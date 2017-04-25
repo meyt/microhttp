@@ -15,8 +15,11 @@ class WebTestCase(unittest.TestCase):
                 root=self.Root(),
             )
 
+    def create_test_app(self):
+        self.app = webtest.TestApp(self._app_instance.wsgi())
+
     def setUp(self):
-        app = self.Application()
-        app.configure(force=True)
-        app.prepare()
-        self.app = webtest.TestApp(app.wsgi())
+        self._app_instance = self.Application()
+        self._app_instance.configure(force=True)
+        self._app_instance.prepare()
+        self.create_test_app()
