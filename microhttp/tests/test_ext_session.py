@@ -20,9 +20,19 @@ class TestCase(WebTestCase):
             @html
             def inc_count(self):
                 with session.get_session() as s:
-                    s['counts'] += 1
-                    counts = s['counts']
-                return str(counts)
+                    if 'counts' in s:
+                        s['counts'] += 1
+                        return str(s['counts'])
+                    else:
+                        return 'fail'
+
+            @html
+            def has_counter(self):
+                with session.get_session() as s:
+                    if 'counts' in s:
+                        return 'True'
+                    else:
+                        return 'False'
 
         def __init__(self):
             self.builtin_configuration += """
@@ -51,11 +61,18 @@ session:
 
     def test_advanced(self):
         for _ in range(20):
-            self.setUp()
-            resp = self.app.get('/init_counter')
+            self.create_test_app()
+            resp = self.app.get('/has_counter')
+            assert resp.status_int == 200
+            assert resp.text == 'False'
 
+            resp = self.app.get('/init_counter')
             assert resp.status_int == 200
             assert 'x_session' in self.app.cookies
+
+            resp = resp.goto('/has_counter')
+            assert resp.status_int == 200
+            assert resp.text == 'True'
 
             for x in range(1, 10):
                 resp = resp.goto('/inc_count')
