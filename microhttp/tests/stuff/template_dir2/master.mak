@@ -1,0 +1,1 @@
+<span><%block name="description"/></span>
