@@ -19,10 +19,12 @@ class Template:
         self._lookup = TemplateLookup(**template_args)
 
     def render(self, filename: str, data: dict):
+        # noinspection PyBroadException
         try:
             return self._lookup.get_template(filename).render(**data)
         except Exception:
             if settings.debug:
+                # noinspection PyBroadException
                 try:
                     return exceptions.html_error_template().render().decode('utf-8')
                 except Exception:
