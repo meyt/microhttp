@@ -1,7 +1,6 @@
 from nanohttp import configure, Controller
-from os.path import abspath
 from microhttp import exceptions
-import threading
+from os.path import abspath, join, dirname
 
 
 class BusInner:
@@ -25,27 +24,12 @@ class BusInner:
         return item in self._items
 
 
-class Bus:
-
-    def get_current(self):
-        if not hasattr(self.thread_local, 'colony_bus'):
-            raise exceptions.BusNotInitializedException('Bus not initialized')
-        else:
-            return self.thread_local.colony_bus
+class Bus(object):
+    __slots__ = ('inner_bus', )
 
     def __init__(self):
-        self.thread_local = threading.local()
-        if not hasattr(self.thread_local, 'colony_bus'):
-            self.thread_local.colony_bus = BusInner()
-
-    def __getattr__(self, key):
-        return getattr(self.thread_local.colony_bus, key)
-
-    def __setattr__(self, key, value):
-        setattr(self.thread_local.colony_bus, key, value)
-
-    def __delattr__(self, key):
-        delattr(self.thread_local.colony_bus, key)
+        if not hasattr(self, 'inner_bus'):
+            self.inner_bus = BusInner()
 
 
 class Application:
@@ -69,32 +53,23 @@ logging:
       - console
       level: DEBUG    """
 
-    def __init__(self, name: str, root: Controller, root_path='.', version='0.1.0-dev.0', process_name=None):
-        self.process_name = process_name or name
-        self.version = version
-        self.name = name
+    def __init__(self, root: Controller, root_path: str='.'):
         self.root = root
         self.root_path = abspath(root_path)
 
     def configure(self, files=None, context=None, **kwargs):
         _context = {
-            'process_name': self.process_name,
             'root_path': self.root_path,
+            'data_dir': join(self.root_path, 'data'),
+            'microhttp_dir': abspath(dirname(__file__))
         }
         if context:
             _context.update(context)
 
         files = files or []
-        configure(init_value=self.builtin_configuration, files=files, context=_context, **kwargs)
+        configure(init_value=self.builtin_configuration, context=_context, files=files, **kwargs)
         from microhttp.ext import log
         log.configure()
-
-    # noinspection PyMethodMayBeStatic
-    def register_cli_launchers(self, subparsers):
-        """
-        This is a template method
-        """
-        pass
 
     @classmethod
     def prepare(cls):
@@ -103,4 +78,4 @@ logging:
     def wsgi(self):
         return self.root.load_app()
 
-bus = Bus()
+bus = Bus().inner_bus
