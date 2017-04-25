@@ -1,10 +1,10 @@
 
 
-class ColonyException(Exception):
+class MicrohttpException(Exception):
     pass
 
 
-class BusNotInitializedException(ColonyException):
+class BusNotInitializedException(MicrohttpException):
     pass
 
 
