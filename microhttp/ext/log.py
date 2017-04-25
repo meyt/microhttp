@@ -4,6 +4,7 @@ from logging.config import dictConfig
 import logging
 bus.ext.log.logger = logging.getLogger()
 
+
 def configure():
     logging.config.dictConfig(dict(settings.logging))
     bus.ext.log.logger = logging.getLogger('main')
