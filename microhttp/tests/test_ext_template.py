@@ -3,6 +3,7 @@ from nanohttp import Controller
 from microhttp import Application as BaseApplication
 from microhttp.ext import template
 from microhttp.tests.helpers import WebTestCase
+from datetime import date
 
 
 class TestCase(WebTestCase):
@@ -18,6 +19,11 @@ class TestCase(WebTestCase):
             def unicode(self):
                 template.set_template('test_dir2')
                 return 'unicode.mako', dict()
+
+            @template.render
+            def advanced(self):
+                template.set_template('test_dir2')
+                return 'advanced.mako', {'today': date.today()}
 
         def __init__(self):
             self.builtin_configuration += """
@@ -45,6 +51,10 @@ template:
             'Hallo wêreld, Здравей, свят, 世界您好, Ahoj světe, Γεια σου κόσμε, שלום לך עולם, '
             'हैलो वर्ल्डm ハローワールド,  , หวัดดีชาวโลก, Привіт, народ, سلام دنيا, Chào thế giới'
         )
+
+    def test_advanced(self):
+        resp = self.app.get('/advanced')
+        assert resp.text == '<span>today: %s</span>' % date.today()
 
 if __name__ == '__main__':
     unittest.main()
