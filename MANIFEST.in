@@ -1,0 +1,1 @@
+recursive-include microhttp/tests/stuff *.mako
