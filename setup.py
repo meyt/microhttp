@@ -3,7 +3,7 @@ readme = open('README.rst').read()
 
 setup(
     name='microhttp',
-    version='0.1.4',
+    version='0.1.5',
     description='A tool-chain for creating web application based on nanohttp',
     long_description=readme,
     url='http://github.com/meyt/microhttp',
