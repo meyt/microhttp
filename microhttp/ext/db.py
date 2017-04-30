@@ -50,4 +50,5 @@ def commit(func):
             return result
         except exc.StatementError:
             commit_all_sessions()
+            raise
     return wrapper
