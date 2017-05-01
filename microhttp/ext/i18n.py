@@ -21,6 +21,7 @@
 
 from nanohttp import settings
 from microhttp import bus
+from microhttp.ext import log
 import gettext
 import locale as lib_locale
 
@@ -44,7 +45,10 @@ def get_default() -> str:
 
 def set_locale(locale=None):
     bus.ext.i18n.default = locale
-    lib_locale.setlocale(lib_locale.LC_ALL, bus.ext.i18n.default)
+    try:
+        lib_locale.setlocale(lib_locale.LC_ALL, bus.ext.i18n.default)
+    except lib_locale.Error:
+        log.exception('microhttp.ext.i18n: Locale error')
 
 
 def translate(word, plural=None) -> str:
