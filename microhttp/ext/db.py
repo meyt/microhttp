@@ -18,7 +18,7 @@ def get_sessions() -> Dict[str, sa_session.Session]:
     return bus.ext.db.sessions
 
 
-def get_session(session_name) -> sa_session.Session:
+def get_session(session_name: str='default') -> sa_session.Session:
     return bus.ext.db.sessions[session_name]
 
 
