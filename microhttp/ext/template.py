@@ -1,6 +1,6 @@
 from mako.lookup import TemplateLookup
 from mako import exceptions
-from nanohttp import html, settings, InternalServerError
+from nanohttp import html, settings, HttpInternalServerError
 from microhttp import bus
 from microhttp.ext import log
 import functools
@@ -33,7 +33,7 @@ class Template:
             else:
                 log.exception('Template render exception')
                 import sys
-                raise InternalServerError(sys.exc_info())
+                raise HttpInternalServerError(sys.exc_info())
 
 
 def set_template(template_name):

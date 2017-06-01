@@ -1,8 +1,8 @@
-from nanohttp import configure, Controller
+from nanohttp import configure, Controller, Application as NanohttpApplication
 from os.path import abspath, join, dirname
 
 
-class Application:
+class Application(NanohttpApplication):
     builtin_configuration = """
 logging:
   version: 1
@@ -24,7 +24,7 @@ logging:
       level: DEBUG    """
 
     def __init__(self, root: Controller, root_path: str='.'):
-        self.root = root
+        super(Application, self).__init__(root=root)
         self.root_path = abspath(root_path)
 
     def configure(self, files=None, context=None, **kwargs):
@@ -44,6 +44,3 @@ logging:
     @classmethod
     def prepare(cls):
         pass
-
-    def wsgi(self):
-        return self.root.load_app()
