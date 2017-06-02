@@ -1,6 +1,6 @@
 from mako.lookup import TemplateLookup
 from mako import exceptions
-from nanohttp import html, settings, HttpInternalServerError
+from nanohttp import action, settings, HttpInternalServerError
 from microhttp import bus
 from microhttp.ext import log
 import functools
@@ -40,17 +40,19 @@ def set_template(template_name):
     bus.ext.template.set_template(template_name)
 
 
-def _render(func):
-    """
-    Mako Decorator
-    :param func:
-    :return:
-    """
+def _render(func, filename):
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        filename, result = func(*args, **kwargs)
-        return bus.ext.template.render(filename=filename, data=result)
+
+        result = func(*args, **kwargs)
+        if hasattr(result, 'to_dict'):
+            result = result.to_dict()
+        elif not isinstance(result, dict):
+            raise ValueError('The result must be an instance of dict, not: %s' % type(result))
+
+        return bus.ext.template.render(filename, result)
+
     return wrapper
 
-
-render = functools.partial(html, inner_decorator=_render)
+render = functools.partial(action, content_type='text/html', inner_decorator=_render)
