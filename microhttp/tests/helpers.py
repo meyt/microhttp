@@ -16,7 +16,7 @@ class WebTestCase(unittest.TestCase):
             )
 
     def create_test_app(self):
-        self.app = webtest.TestApp(self._app_instance.wsgi())
+        self.app = webtest.TestApp(self._app_instance)
 
     def setUp(self):
         self._app_instance = self.Application()
