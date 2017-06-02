@@ -10,20 +10,20 @@ class TestCase(WebTestCase):
 
     class Application(BaseApplication):
         class Root(Controller):
-            @template.render
+            @template.render('simple.mako')
             def simple(self):
                 template.set_template('test_dir1')
-                return 'simple.mako', dict()
+                return dict()
 
-            @template.render
+            @template.render('unicode.mako')
             def unicode(self):
                 template.set_template('test_dir2')
-                return 'unicode.mako', dict()
+                return dict()
 
-            @template.render
+            @template.render('advanced.mako')
             def advanced(self):
                 template.set_template('test_dir2')
-                return 'advanced.mako', {'today': date.today()}
+                return {'today': date.today()}
 
         def __init__(self):
             self.builtin_configuration += """
