@@ -110,6 +110,8 @@ class ReCaptcha:
         Verify Response
         :return: bool
         """
+        if settings.debug:
+            return True
         response_value = context.form.get('g-recaptcha-response', '')
         params = {
             'secret': self.secret_key,
