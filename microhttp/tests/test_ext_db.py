@@ -1,6 +1,6 @@
 import unittest
 
-from nanohttp import Controller, html, InternalServerError
+from nanohttp import Controller, html, HttpInternalServerError
 
 from microhttp import Application as BaseApplication
 from microhttp.ext import db
@@ -18,7 +18,7 @@ class TestCase(WebTestCase):
                     db_session.execute('SELECT * FROM sqlite_master')
                     return ''
                 except:
-                    raise InternalServerError
+                    raise HttpInternalServerError
 
             @html
             def db2(self):
@@ -27,7 +27,7 @@ class TestCase(WebTestCase):
                     db_session.execute('SELECT * FROM sqlite_master')
                     return ''
                 except:
-                    raise InternalServerError
+                    raise HttpInternalServerError
 
         def __init__(self):
             self.builtin_configuration += """
