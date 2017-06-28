@@ -7,7 +7,7 @@
     
 """
 
-from nanohttp import settings, context, HttpCookie
+from nanohttp import settings, context
 from microhttp import bus
 from datetime import datetime
 
@@ -44,11 +44,11 @@ class DogpileCacheSession:
     def __enter__(self):
         self._session = {}
         if settings.session.cookie_name in context.cookies:
-            self._session_id = context.cookies[settings.session.cookie_name]
+            self._session_id = context.cookies[settings.session.cookie_name].value
         else:
             self._session_id = self.make_session_id()
-            context.response_cookies.append(HttpCookie(name=settings.session.cookie_name,
-                                                       value=self._session_id, http_only=True))
+            context.cookies[settings.session.cookie_name] = self._session_id
+            context.cookies[settings.session.cookie_name]['httponly'] = True
         tmp = self.region.get(self._session_id)
         if isinstance(tmp, dict):
             self._session = tmp
