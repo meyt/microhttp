@@ -48,7 +48,7 @@ def set_locale(locale=None):
     try:
         lib_locale.setlocale(lib_locale.LC_ALL, bus.ext.i18n.default)
     except lib_locale.Error:
-        log.exception('microhttp.ext.i18n: Locale error')
+        log.exception('microhttp.ext.i18n: Locale error (%s)' % bus.ext.i18n.default)
 
 
 def translate(word, plural=None) -> str:
