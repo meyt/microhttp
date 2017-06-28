@@ -3,7 +3,7 @@ readme = open('README.rst').read()
 
 setup(
     name='microhttp',
-    version='0.2.1',
+    version='0.3.0',
     description='A tool-chain for creating web application based on nanohttp',
     long_description=readme,
     url='http://github.com/meyt/microhttp',
@@ -21,7 +21,7 @@ setup(
         'Topic :: Software Development :: Libraries'
     ],
     install_requires=[
-        'nanohttp >= 0.9.0',
+        'nanohttp >= 0.13.0',
         'dogpile.cache',
         'sqlalchemy',
         'webtest',
