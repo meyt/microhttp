@@ -28,6 +28,15 @@ def drop_all(metadata, sessions_list=None):
         metadata.drop_all(bind=bus.ext.db.sessions[session].bind)
 
 
+def commit_all():
+    for session_alias, session in bus.ext.db.sessions.items():
+        try:
+            session.commit()
+        except:
+            session.rollback()
+            raise
+
+
 def commit(func):
     """
     Commit Decorator
@@ -37,18 +46,11 @@ def commit(func):
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        def commit_all_sessions():
-            for session_alias, session in bus.ext.db.sessions.items():
-                try:
-                    session.commit()
-                except:
-                    session.rollback()
-                    raise
         try:
             result = func(*args, **kwargs)
-            commit_all_sessions()
+            commit_all()
             return result
         except exc.StatementError:
-            commit_all_sessions()
+            commit_all()
             raise
     return wrapper
