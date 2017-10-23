@@ -8,18 +8,19 @@ import functools
 
 def configure():
     bus.ext.db.sessions = {}
-    for db_alias, db_spec in settings.sqlalchemy.items():
-        sa_engine = create_engine(**db_spec['engine'])
-        db_spec['session']['bind'] = sa_engine
-        bus.ext.db.sessions[db_alias] = scoped_session(sessionmaker(**db_spec['session']))
+    for session_alias, session_spec in settings.sqlalchemy.items():
+        sa_engine = create_engine(**session_spec['engine'])
+        session_kwargs = dict(session_spec['session'])
+        session_kwargs['bind'] = sa_engine
+        bus.ext.db.sessions[session_alias] = scoped_session(sessionmaker(**session_kwargs))
 
 
 def get_sessions() -> Dict[str, sa_session.Session]:
     return bus.ext.db.sessions
 
 
-def get_session(session_name: str='default') -> sa_session.Session:
-    return bus.ext.db.sessions[session_name]
+def get_session(session_alias: str='default') -> sa_session.Session:
+    return bus.ext.db.sessions[session_alias]
 
 
 def drop_all(metadata, sessions_list=None):
