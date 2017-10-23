@@ -1,6 +1,6 @@
 import unittest
 
-from nanohttp import Controller, html, HttpInternalServerError
+from nanohttp import Controller, html, HttpInternalServerError, settings
 
 from microhttp import Application as BaseApplication
 from microhttp.ext import db
@@ -30,28 +30,29 @@ class TestCase(WebTestCase):
                     raise HttpInternalServerError
 
         def __init__(self):
-            self.builtin_configuration += """
-sqlalchemy:
-  default:
-    engine:
-      name_or_url: 'sqlite:///:memory:'
-      echo: false
-    session:
-      autoflush: True
-      autocommit: False
-      expire_on_commit: True
-  db2:
-    engine:
-      name_or_url: 'sqlite:///:memory:'
-      echo: false
-    session:
-      autoflush: True
-      autocommit: False
-      expire_on_commit: True
-            """
             super().__init__(self.Root())
 
-        def prepare(self):
+        def configure(self, *args, **kwargs):
+            super().configure(*args, **kwargs)
+            settings.merge("""
+                sqlalchemy:
+                  default:
+                    engine:
+                      name_or_url: 'sqlite:///:memory:'
+                      echo: false
+                    session:
+                      autoflush: True
+                      autocommit: False
+                      expire_on_commit: True
+                  db2:
+                    engine:
+                      name_or_url: 'sqlite:///:memory:'
+                      echo: false
+                    session:
+                      autoflush: True
+                      autocommit: False
+                      expire_on_commit: True
+            """)
             db.configure()
 
     def test_simple(self):
