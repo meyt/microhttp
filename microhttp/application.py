@@ -23,7 +23,7 @@ logging:
       - console
       level: DEBUG    """
 
-    def __init__(self, root: Controller, root_path: str='.'):
+    def __init__(self, root: Controller=None, root_path: str='.'):
         super(Application, self).__init__(root=root)
         self.root_path = abspath(root_path)
 
