@@ -42,5 +42,6 @@ logging:
         log.configure()
 
     @classmethod
-    def prepare(cls):
-        pass
+    def prepare(cls):  # pragma: nocover
+        """ Reserved for preparing the application """
+        raise NotImplementedError
