@@ -10,7 +10,7 @@ def configure():
     bus.ext.db.sessions = {}
     for session_alias, session_spec in settings.sqlalchemy.items():
         sa_engine = create_engine(**session_spec['engine'])
-        session_kwargs = dict(session_spec['session'])
+        session_kwargs = dict(session_spec['session']) if 'session' in session_spec else dict()
         session_kwargs['bind'] = sa_engine
         bus.ext.db.sessions[session_alias] = scoped_session(sessionmaker(**session_kwargs))
 
