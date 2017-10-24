@@ -1,9 +1,12 @@
+import functools
+from typing import Dict
+
 from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import scoped_session, sessionmaker, session as sa_session
-from microhttp import bus
+
 from nanohttp import settings
-from typing import Dict
-import functools
+
+from microhttp import bus
 
 
 def configure():
