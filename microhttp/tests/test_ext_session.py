@@ -1,5 +1,5 @@
 import unittest
-from nanohttp import Controller, html
+from nanohttp import Controller, html, settings
 from microhttp import Application as BaseApplication
 from microhttp.ext import session
 from microhttp.tests.helpers import WebTestCase
@@ -7,6 +7,7 @@ from microhttp.tests.helpers import WebTestCase
 
 class TestCase(WebTestCase):
 
+    # noinspection PyAbstractClass
     class Application(BaseApplication):
         class Root(Controller):
 
@@ -35,49 +36,49 @@ class TestCase(WebTestCase):
                         return 'False'
 
         def __init__(self):
-            self.builtin_configuration += """
-
-session:
-  dogpile:  
-    backend: dogpile.cache.dbm
-    expiration_time: 3600
-    arguments:
-      filename:  %(microhttp_dir)s/tests/stuff/sessions.dbm
-  cookie_name: x_session
-"""
             super().__init__(self.Root())
 
-        def prepare(self):
+        def configure(self, *args, **kwargs):
+            super().configure(*args, **kwargs)
+            settings.merge("""
+                session:
+                  dogpile:  
+                    backend: dogpile.cache.dbm
+                    expiration_time: 3600
+                    arguments:
+                      filename:  %(microhttp_dir)s/tests/stuff/sessions.dbm
+                  cookie_name: x_session
+            """)
             session.configure()
 
     def test_simple(self):
         resp = self.app.get('/init_counter')
-        assert resp.status_int == 200
-        assert 'x_session' in self.app.cookies
+        self.assertEqual(resp.status_int, 200)
+        self.assertIn('x_session', self.app.cookies)
         for x in range(1, 10):
             resp = resp.goto('/inc_count')
-            assert resp.status_int == 200
-            assert resp.text == str(x)
+            self.assertEqual(resp.status_int, 200)
+            self.assertEqual(resp.text, str(x))
 
     def test_advanced(self):
         for _ in range(20):
             self.create_test_app()
             resp = self.app.get('/has_counter')
-            assert resp.status_int == 200
-            assert resp.text == 'False'
+            self.assertEqual(resp.status_int, 200)
+            self.assertEqual(resp.text, 'False')
 
             resp = self.app.get('/init_counter')
-            assert resp.status_int == 200
-            assert 'x_session' in self.app.cookies
+            self.assertEqual(resp.status_int, 200)
+            self.assertIn('x_session', self.app.cookies)
 
             resp = resp.goto('/has_counter')
-            assert resp.status_int == 200
-            assert resp.text == 'True'
+            self.assertEqual(resp.status_int, 200)
+            self.assertEqual(resp.text, 'True')
 
             for x in range(1, 10):
                 resp = resp.goto('/inc_count')
-                assert resp.status_int == 200
-                assert resp.text == str(x)
+                self.assertEqual(resp.status_int, 200)
+                self.assertEqual(resp.text, str(x))
 
 
 if __name__ == '__main__':

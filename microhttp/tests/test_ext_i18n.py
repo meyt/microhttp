@@ -1,5 +1,5 @@
 import unittest
-from nanohttp import Controller, html
+from nanohttp import Controller, html, settings
 from microhttp import Application as BaseApplication
 from microhttp.ext import i18n
 from microhttp.tests.helpers import WebTestCase
@@ -8,6 +8,7 @@ from locale import Error as LocaleError
 
 class TestCase(WebTestCase):
 
+    # noinspection PyAbstractClass
     class Application(BaseApplication):
         class Root(Controller):
             @html
@@ -34,19 +35,19 @@ class TestCase(WebTestCase):
                 return _('Hello World')
 
         def __init__(self):
-            self.builtin_configuration += """
-
-i18n:
-  locales:
-    - en_US
-    - fa_IR
-  localedir: %(microhttp_dir)s/tests/stuff/i18n
-  domain: microhttp_app
-  default: en_US
-  """
             super().__init__(self.Root())
 
-        def prepare(self):
+        def configure(self, *args, **kwargs):
+            super().configure(*args, **kwargs)
+            settings.merge("""
+                i18n:
+                  locales:
+                    - en_US
+                    - fa_IR
+                  localedir: %(microhttp_dir)s/tests/stuff/i18n
+                  domain: microhttp_app
+                  default: en_US
+            """)
             try:
                 i18n.configure()
             except LocaleError:
@@ -54,19 +55,18 @@ i18n:
 
     def test_default(self):
         resp = self.app.get('/')
-        assert resp.status_int == 200
-        assert resp.text == 'Hello World'
+        self.assertEqual(resp.status_int, 200)
+        self.assertEqual(resp.text, 'Hello World')
 
     def test_en_us(self):
         resp = self.app.get('/en_us')
-        assert resp.status_int == 200
-        assert resp.text == 'Hello World'
+        self.assertEqual(resp.status_int, 200)
+        self.assertEqual(resp.text, 'Hello World')
 
     def test_fa_ir(self):
         resp = self.app.get('/fa_ir')
-        assert resp.status_int == 200
-        assert resp.text == 'سلام دنیا'
-
+        self.assertEqual(resp.status_int, 200)
+        self.assertEqual(resp.text, 'سلام دنیا')
 
 if __name__ == '__main__':
     unittest.main()
