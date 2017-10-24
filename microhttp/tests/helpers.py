@@ -21,5 +21,4 @@ class WebTestCase(unittest.TestCase):
     def setUp(self):
         self._app_instance = self.Application()
         self._app_instance.configure(force=True)
-        self._app_instance.prepare()
         self.create_test_app()
