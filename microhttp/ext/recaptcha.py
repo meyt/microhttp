@@ -138,6 +138,8 @@ class ReCaptcha:
 
 
 def configure():
+    from microhttp.ext import log
+    log.warning('microhttp.ext.recaptcha deprecated')
     bus.ext.recaptcha = ReCaptcha(**settings.recaptcha)
 
 
