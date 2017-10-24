@@ -7,6 +7,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker, session as sa_session
 from nanohttp import settings
 
 from microhttp import bus
+from microhttp.ext.db.database_manager import DatabaseManager
 
 
 def configure():
@@ -24,6 +25,10 @@ def get_sessions() -> Dict[str, sa_session.Session]:
 
 def get_session(session_alias: str='default') -> sa_session.Session:
     return bus.ext.db.sessions[session_alias]
+
+
+def get_database_manager(session_alias: str='default') -> DatabaseManager:
+    return DatabaseManager(settings.sqlalchemy[session_alias])
 
 
 def drop_all(metadata, sessions_list=None):
