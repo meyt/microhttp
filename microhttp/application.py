@@ -38,8 +38,14 @@ logging:
 
         files = files or []
         configure(init_value=self.builtin_configuration, context=_context, files=files, **kwargs)
+        self.after_load_configuration()
         from microhttp.ext import log
         log.configure()
+
+    # noinspection PyMethodMayBeStatic
+    def after_load_configuration(self):  # pragma: nocover
+        """ A hook called after configurations load """
+        pass
 
     @classmethod
     def prepare(cls):  # pragma: nocover
