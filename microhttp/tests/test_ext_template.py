@@ -57,5 +57,5 @@ class TestCase(WebTestCase):
         resp = self.app.get('/advanced')
         self.assertEqual(resp.text, '<span>today: %s</span>' % date.today())
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: nocover
     unittest.main()

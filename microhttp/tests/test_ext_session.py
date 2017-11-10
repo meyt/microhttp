@@ -81,5 +81,5 @@ class TestCase(WebTestCase):
                 self.assertEqual(resp.text, str(x))
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: nocover
     unittest.main()

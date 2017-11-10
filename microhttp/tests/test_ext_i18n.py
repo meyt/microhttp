@@ -68,5 +68,5 @@ class TestCase(WebTestCase):
         self.assertEqual(resp.status_int, 200)
         self.assertEqual(resp.text, 'سلام دنیا')
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: nocover
     unittest.main()

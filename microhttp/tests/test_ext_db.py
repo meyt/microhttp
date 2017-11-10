@@ -112,5 +112,5 @@ class TestCase(WebTestCase):
             with db.get_database_manager('db4'):
                 pass
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: nocover
     unittest.main()
