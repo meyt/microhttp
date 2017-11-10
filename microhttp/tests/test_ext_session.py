@@ -1,5 +1,5 @@
 import unittest
-from nanohttp import Controller, html, settings
+from nanohttp import Controller, text, settings, HttpBadRequest
 from microhttp import Application as BaseApplication
 from microhttp.ext import session
 from microhttp.tests.helpers import WebTestCase
@@ -11,23 +11,23 @@ class TestCase(WebTestCase):
     class Application(BaseApplication):
         class Root(Controller):
 
-            @html
+            @text
             def init_counter(self):
                 with session.get_session() as s:
                     s['counts'] = 0
 
                 return ''
 
-            @html
+            @text
             def inc_count(self):
                 with session.get_session() as s:
                     if 'counts' in s:
                         s['counts'] += 1
                         return str(s['counts'])
                     else:
-                        return 'fail'
+                        raise HttpBadRequest('counter not initialized')
 
-            @html
+            @text
             def has_counter(self):
                 with session.get_session() as s:
                     if 'counts' in s:
@@ -66,6 +66,8 @@ class TestCase(WebTestCase):
             resp = self.app.get('/has_counter')
             self.assertEqual(resp.status_int, 200)
             self.assertEqual(resp.text, 'False')
+
+            self.app.get('/inc_count', status=400)
 
             resp = self.app.get('/init_counter')
             self.assertEqual(resp.status_int, 200)
