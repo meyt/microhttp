@@ -12,26 +12,9 @@ class TestCase(WebTestCase):
     class Application(BaseApplication):
         class Root(Controller):
             @html
-            def index(self):
+            def index(self, locale: str='en_us'):
                 _ = i18n.translate
-                return _('Hello World')
-
-            @html
-            def fa_ir(self):
-                _ = i18n.translate
-                try:
-                    i18n.set_locale('fa_IR')
-                except LocaleError:
-                    pass
-                return _('Hello World')
-
-            @html
-            def en_us(self):
-                _ = i18n.translate
-                try:
-                    i18n.set_locale('en_US')
-                except LocaleError:
-                    pass
+                i18n.set_locale(locale)
                 return _('Hello World')
 
         def __init__(self):
@@ -46,7 +29,7 @@ class TestCase(WebTestCase):
                     - fa_IR
                   localedir: %(microhttp_dir)s/tests/stuff/i18n
                   domain: microhttp_app
-                  default: en_US
+                  default: en_us
             """)
             try:
                 i18n.configure()
@@ -59,12 +42,12 @@ class TestCase(WebTestCase):
         self.assertEqual(resp.text, 'Hello World')
 
     def test_en_us(self):
-        resp = self.app.get('/en_us')
+        resp = self.app.get('/en_US')
         self.assertEqual(resp.status_int, 200)
         self.assertEqual(resp.text, 'Hello World')
 
     def test_fa_ir(self):
-        resp = self.app.get('/fa_ir')
+        resp = self.app.get('/fa_IR')
         self.assertEqual(resp.status_int, 200)
         self.assertEqual(resp.text, 'سلام دنیا')
 
