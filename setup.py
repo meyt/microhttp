@@ -30,7 +30,6 @@ setup(
         'nanohttp >= 0.13.0',
         'dogpile.cache',
         'sqlalchemy',
-        'webtest',
         'mako'
     ]
 )
