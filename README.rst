@@ -1,6 +1,9 @@
 microhttp
 =========
 
+.. image:: https://img.shields.io/pypi/pyversions/microhttp.svg
+    :target: https://pypi.python.org/pypi/microhttp
+
 A tool-chain for web applications based on `nanohttp <https://github.com/pylover/nanohttp>`_.
 
 
