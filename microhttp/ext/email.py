@@ -96,11 +96,11 @@ class Email:
         self.provider = bus.ext.email.providers[provider] if isinstance(provider, str) else provider
 
     def send(self, to: str, message: str,
-             from_: str = '', cc: list=None,
-             subject: str='', files: list=None):
+             message_html: str=None, from_: str = '',
+             cc: list=None, subject: str='', files: list=None):
 
         self.provider.send(to=to, from_=from_, cc=cc,
-                           message_plain=message, message_html=None,
+                           message_plain=message, message_html=message_html,
                            subject=subject, files=files)
 
     def __enter__(self):
