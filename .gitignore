@@ -1,0 +1,8 @@
+.coverage
+.idea/
+bin/
+dist/
+microhttp.egg-info/
+__pycache__/
+microhttp/tests/stuff/*.dbm
+microhttp/tests/stuff/*.dbm.rw.lock
