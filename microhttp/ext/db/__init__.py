@@ -35,7 +35,7 @@ def commit_all():
     for session_alias, session in bus.ext.db.sessions.items():
         try:
             session.commit()
-        except:
+        except Exception:
             session.rollback()
             raise
 
@@ -43,8 +43,7 @@ def commit_all():
 def commit(func):
     """
     Commit Decorator
-    Notice: Use it before nanohttp:action family decorators like template.render.
-    :param func: 
+    :param func:
     :return: 
     """
     @functools.wraps(func)
