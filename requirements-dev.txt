@@ -3,3 +3,5 @@ mock
 webtest
 coverage
 coveralls
+pymysql
+psycopg2
