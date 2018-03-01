@@ -77,6 +77,7 @@ class EmailExtensionTestCase(WebTestCase):
     @mock.patch('microhttp.ext.email.smtplib.SMTP', SMTP)
     def test_with_template(self):
         self.app.post('/email_with_template', status=200)
+        self.assertTrue('Steve welcome to example.com' in SMTP().inbox[-1].fullmessage)
 
     @mock.patch('microhttp.ext.email.smtplib.SMTP', SMTP)
     def test_dynamic_params(self):
