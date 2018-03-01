@@ -8,8 +8,7 @@ class Message:  # pragma:nocover
 
 
 class SMTP:  # pragma:nocover
-    inbox = []
-    has_quit = False
+    __slots__ = ('inbox', 'username', 'password', 'has_quit',)
 
     def __init__(self, *args, **kwargs):
         pass
@@ -20,13 +19,18 @@ class SMTP:  # pragma:nocover
     def starttls(self):
         pass
 
-    def login(self, username, password):
-        self.username = username
-        self.password = password
+    @classmethod
+    def login(cls, username, password):
+        cls.username = username
+        cls.password = password
 
-    def sendmail(self, from_address, to_address, fullmessage):
-        self.inbox.append(Message(from_address, to_address, fullmessage))
+    @classmethod
+    def sendmail(cls, from_address, to_address, fullmessage):
+        if type(cls.inbox) is not list:
+            cls.inbox = []
+        cls.inbox.append(Message(from_address, to_address, fullmessage))
         return []
 
-    def quit(self):
-        self.has_quit = True
+    @classmethod
+    def quit(cls):
+        cls.has_quit = True
