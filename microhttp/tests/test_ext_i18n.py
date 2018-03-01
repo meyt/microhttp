@@ -3,7 +3,6 @@ from nanohttp import Controller, html, settings
 from microhttp import Application as BaseApplication
 from microhttp.ext import i18n
 from microhttp.tests.helpers import WebTestCase
-from locale import Error as LocaleError
 
 
 class TestCase(WebTestCase):
@@ -31,10 +30,7 @@ class TestCase(WebTestCase):
                   domain: microhttp_app
                   default: en_us
             """)
-            try:
-                i18n.configure()
-            except LocaleError:
-                pass
+            i18n.configure()
 
     def test_default(self):
         resp = self.app.get('/')
@@ -50,6 +46,7 @@ class TestCase(WebTestCase):
         resp = self.app.get('/fa_IR')
         self.assertEqual(resp.status_int, 200)
         self.assertEqual(resp.text, 'سلام دنیا')
+
 
 if __name__ == '__main__':  # pragma: nocover
     unittest.main()
