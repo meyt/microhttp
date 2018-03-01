@@ -1,10 +1,12 @@
 import unittest
 import webtest
+from os.path import dirname, join
 from nanohttp import Controller
 from microhttp import Application as BaseApplication
 
 
 class WebTestCase(unittest.TestCase):
+    stuff_dir = join(dirname(__file__), 'stuff')
 
     class Application(BaseApplication):
         class Root(Controller):
