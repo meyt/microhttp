@@ -54,8 +54,8 @@ class EmailProvider:
     def disconnect(self):
         self.mail.quit()
 
-    def send(self, to: str, from_: str= '', cc: list=None,
-             message_plain: str=None, message_html: str=None,
+    def send(self, to: str, message_plain: str, from_: str= '',
+             cc: list=None, message_html: str=None,
              subject: str='', files: list=None):
         msg = MIMEMultipart('alternative')
         msg['From'] = from_
@@ -66,15 +66,10 @@ class EmailProvider:
             msg['CC'] = ",".join(cc)
 
         msg['Subject'] = subject
-
-        if message_plain is not None:
-            msg.attach(MIMEText(message_plain, 'plain'))
+        msg.attach(MIMEText(message_plain, 'plain'))
 
         if message_html is not None:
             msg.attach(MIMEText(message_html, 'html'))
-
-        if message_plain is None and message_html is None:
-            raise ValueError('One of message_plain or message_html must set.')
 
         if isinstance(files, list):
             for file_path in files:
