@@ -29,7 +29,7 @@ class Template:
                     return exceptions.html_error_template().render().decode('utf-8')
                 except Exception:
                     log.exception('Template render exception - Debug Mode')
-                    return 'Cannot locate template file (%s).' % filename
+                    raise HttpInternalServerError('Cannot locate template file (%s).' % filename)
             else:
                 log.exception('Template render exception')
                 import sys
@@ -54,5 +54,6 @@ def _render(func, filename):
         return bus.ext.template.render(filename, result)
 
     return wrapper
+
 
 render = functools.partial(action, content_type='text/html', inner_decorator=_render)
