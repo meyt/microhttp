@@ -4,6 +4,9 @@ microhttp
 .. image:: https://img.shields.io/pypi/pyversions/microhttp.svg
     :target: https://pypi.python.org/pypi/microhttp
 
+.. image:: https://coveralls.io/repos/github/meyt/microhttp/badge.svg?branch=master
+    :target: https://coveralls.io/github/meyt/microhttp?branch=master
+
 A tool-chain for web applications based on `nanohttp <https://github.com/pylover/nanohttp>`_.
 
 
