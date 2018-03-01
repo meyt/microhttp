@@ -31,12 +31,6 @@ def get_database_manager(session_alias: str='default') -> DatabaseManager:
     return DatabaseManager(settings.sqlalchemy[session_alias])
 
 
-def drop_all(metadata, sessions_list=None):
-    sessions_list = sessions_list or bus.ext.db.sessions.keys()
-    for session in sessions_list:
-        metadata.drop_all(bind=bus.ext.db.sessions[session].bind)
-
-
 def commit_all():
     for session_alias, session in bus.ext.db.sessions.items():
         try:
