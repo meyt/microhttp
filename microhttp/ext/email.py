@@ -143,7 +143,3 @@ def configure():
 
 def get_providers() -> dict:
     return bus.ext.email.providers
-
-
-def get_provider(provider_name: str) -> EmailProvider:
-    return bus.ext.email.providers[provider_name]
