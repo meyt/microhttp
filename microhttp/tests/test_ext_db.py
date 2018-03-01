@@ -1,11 +1,24 @@
 import mock
 import unittest
 
-from nanohttp import Controller, html, HttpInternalServerError, settings
+from sqlalchemy import MetaData, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+
+from nanohttp import Controller, html, settings
 
 from microhttp import Application as BaseApplication
 from microhttp.ext import db
 from microhttp.tests.helpers import WebTestCase
+
+
+metadata = MetaData()
+DeclarativeBase = declarative_base(metadata=metadata)
+
+
+class Tag(DeclarativeBase):
+    __tablename__ = 'tags'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    tag = Column(String(120), nullable=False, unique=True)
 
 
 class TestCase(WebTestCase):
@@ -24,6 +37,33 @@ class TestCase(WebTestCase):
                 db_session = db.get_session('db2')
                 db_session.execute('SELECT * FROM sqlite_master')
                 return ''
+
+            @html
+            @db.commit
+            def new(self):
+                db_session = db.get_session('db2')
+                db_session.execute("""
+                    CREATE TABLE BOOKS ( title TEXT NOT NULL, publication_date TEXT)
+                """)
+                return ''
+
+            @html
+            @db.commit
+            def fail(self):
+                db_session = db.get_session('db2')
+                metadata.create_all(bind=db_session.get_bind())
+                tag = Tag()
+                tag.tag = 'Book'
+                db_session.add(tag)
+
+                tag = Tag()
+                tag.tag = 'Book'
+                db_session.add(tag)
+                return ''
+
+            @html
+            def all_sessions(self):
+                return ','.join(db.get_sessions().keys())
 
         def __init__(self):
             super().__init__(self.Root())
@@ -76,12 +116,24 @@ class TestCase(WebTestCase):
             manager.drop_database()
 
     def test_simple(self):
-        resp = self.app.get('/')
-        assert resp.status_int == 200
+        self.app.get('/', status=200)
+
+    def test_fail(self):
+        # Note: this should return 500, but on webtest
+        # exception raises before handling by nanohttp
+        with self.assertRaises(Exception):
+            self.app.get('/fail', status=500)
+
+    def test_all_sessions(self):
+        resp = self.app.get('/all_sessions')
+        for session_alias in resp.text.split(','):
+            self.assertTrue(session_alias, ['default', 'db2', 'db3', 'db4'])
 
     def test_another_database(self):
-        resp = self.app.get('/db2')
-        assert resp.status_int == 200
+        self.app.get('/db2', status=200)
+
+    def test_new(self):
+        self.app.get('/new', status=200)
 
     @mock.patch('microhttp.ext.db.database_manager.create_engine')
     def test_database_manager(self, *_):
