@@ -16,20 +16,14 @@ class TestCase(WebTestCase):
             @html
             def index(self):
                 db_session = db.get_session()
-                try:
-                    db_session.execute('SELECT * FROM sqlite_master')
-                    return ''
-                except:
-                    raise HttpInternalServerError
+                db_session.execute('SELECT * FROM sqlite_master')
+                return ''
 
             @html
             def db2(self):
                 db_session = db.get_session('db2')
-                try:
-                    db_session.execute('SELECT * FROM sqlite_master')
-                    return ''
-                except:
-                    raise HttpInternalServerError
+                db_session.execute('SELECT * FROM sqlite_master')
+                return ''
 
         def __init__(self):
             super().__init__(self.Root())
@@ -94,8 +88,6 @@ class TestCase(WebTestCase):
         with self.assertRaises(RuntimeError):
             with db.get_database_manager('db2') as manager:
                 manager.create_database()
-                manager.create_database()
-                manager.drop_database()
 
         with db.get_database_manager('db3') as manager:
             manager.create_database_if_not_exists()
@@ -109,8 +101,8 @@ class TestCase(WebTestCase):
 
         settings.sqlalchemy.db4.engine.name_or_url = 'access:///'
         with self.assertRaises(ValueError):
-            with db.get_database_manager('db4'):
-                pass
+            db.get_database_manager('db4').__enter__()
+
 
 if __name__ == '__main__':  # pragma: nocover
     unittest.main()
