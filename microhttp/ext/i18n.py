@@ -51,12 +51,14 @@ def set_locale(locale=None):
         log.exception('microhttp.ext.i18n: Locale error (%s)' % bus.ext.i18n.default)
 
 
-def translate(word, plural=None) -> str:
+def translate(word, plural=None, n=None) -> str:
     if bus.ext.i18n.default in bus.ext.i18n.locales_translation:
         if plural is not None:
-            return bus.ext.i18n.locales_translation[bus.ext.i18n.default].ngettext(word, plural)
+            return bus.ext.i18n.locales_translation[bus.ext.i18n.default].ngettext(word, plural, n)
         else:
             return bus.ext.i18n.locales_translation[bus.ext.i18n.default].gettext(word)
     else:
         return word
+
+
 _ = translate

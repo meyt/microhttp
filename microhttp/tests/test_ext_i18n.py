@@ -11,10 +11,18 @@ class TestCase(WebTestCase):
     class Application(BaseApplication):
         class Root(Controller):
             @html
-            def index(self, locale: str='en_us'):
+            def index(self, locale: str=None):
+                locale = locale or i18n.get_default()
                 _ = i18n.translate
                 i18n.set_locale(locale)
                 return _('Hello World')
+
+            @html
+            def plural(self, locale: str=None, count: int=0):
+                locale = locale or i18n.get_default()
+                _ = i18n.translate
+                i18n.set_locale(locale)
+                return _('One new notification', '%(count)d new notification', int(count)) % {'count': int(count)}
 
         def __init__(self):
             super().__init__(self.Root())
@@ -33,19 +41,25 @@ class TestCase(WebTestCase):
             i18n.configure()
 
     def test_default(self):
-        resp = self.app.get('/')
-        self.assertEqual(resp.status_int, 200)
+        resp = self.app.get('/', status=200)
         self.assertEqual(resp.text, 'Hello World')
 
     def test_en_us(self):
-        resp = self.app.get('/en_US')
-        self.assertEqual(resp.status_int, 200)
+        resp = self.app.get('/en_US', status=200)
         self.assertEqual(resp.text, 'Hello World')
 
     def test_fa_ir(self):
-        resp = self.app.get('/fa_IR')
-        self.assertEqual(resp.status_int, 200)
+        resp = self.app.get('/fa_IR', status=200)
         self.assertEqual(resp.text, 'سلام دنیا')
+
+        resp = self.app.get('/plural/fa_IR/1', status=200)
+        self.assertEqual(resp.text, 'یک اعلان جدید')
+
+        resp = self.app.get('/plural/fa_IR/2', status=200)
+        self.assertEqual(resp.text, '2 اعلان جدید')
+
+        resp = self.app.get('/plural/fa_IR/5', status=200)
+        self.assertEqual(resp.text, 'اعلانات: 5')
 
 
 if __name__ == '__main__':  # pragma: nocover
