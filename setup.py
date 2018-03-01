@@ -1,5 +1,4 @@
 import re
-import sys
 from os.path import join, dirname
 from setuptools import setup, find_packages
 readme = open('README.rst').read()
@@ -15,9 +14,6 @@ dependencies = [
     'sqlalchemy',
     'mako'
 ]
-if sys.version_info <= (3, 5):
-    dependencies.append('typing')
-
 
 setup(
     name='microhttp',
@@ -35,8 +31,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: POSIX :: Linux',
         'Operating System :: Unix',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Topic :: Software Development :: Libraries'
