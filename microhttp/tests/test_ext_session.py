@@ -15,8 +15,9 @@ class TestCase(WebTestCase):
             def init_counter(self):
                 with session.get_session() as s:
                     s['counts'] = 0
-
-                return ''
+                    s['temp'] = 0
+                    del s['temp']
+                    return s.get('counts')
 
             @text
             def inc_count(self):

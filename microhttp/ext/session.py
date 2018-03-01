@@ -57,7 +57,7 @@ class DogpileCacheSession:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.region.set(self._session_id, self._session)
 
-    def clear(self):  # TODO
+    def clear(self):  # pragma:nocover # TODO
         pass
 
 
