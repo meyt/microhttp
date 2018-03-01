@@ -1,22 +1,17 @@
+from logging import Logger, getLogger
+from logging.config import dictConfig
 from nanohttp import settings
 from microhttp import bus
-from logging.config import dictConfig
-import logging
-bus.ext.log.logger = logging.getLogger()
+bus.ext.log.logger = getLogger()
 
 
 def configure():
-    logging.config.dictConfig(dict(settings.logging))
-    bus.ext.log.logger = logging.getLogger('main')
+    dictConfig(dict(settings.logging))
+    bus.ext.log.logger = getLogger('main')
 
 
-def get_logger() -> logging.Logger:
+def get_logger() -> Logger:
     return bus.ext.log.logger
-
-
-def close():
-    for handler in get_logger().handlers:
-        handler.close()
 
 
 def warning(message: str):
