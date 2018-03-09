@@ -30,6 +30,10 @@ class TestCase(WebTestCase):
     def test_log(self):
         self.app.get('/', status=200)
 
+    @classmethod
+    def tearDownClass(cls):
+        log.close()
+
 
 if __name__ == '__main__':  # pragma: nocover
     unittest.main()

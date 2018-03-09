@@ -14,6 +14,12 @@ def get_logger() -> Logger:
     return bus.ext.log.logger
 
 
+def close():
+    """ Close all logging handlers """
+    for handler in get_logger().handlers:
+        handler.close()
+
+
 def warning(message: str):
     bus.ext.log.logger.warning(message)
 
