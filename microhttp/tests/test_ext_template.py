@@ -94,8 +94,7 @@ class TestCase(WebTestCase):
 
         self.app.get('/missed_file', status=500)
 
-        with self.assertRaises(ValueError):
-            self.app.get('/invalid_data')
+        self.app.get('/invalid_data', status=500)
 
 
 if __name__ == '__main__':  # pragma: nocover

@@ -7,6 +7,7 @@ from microhttp import Application as BaseApplication
 
 class WebTestCase(unittest.TestCase):
     stuff_dir = join(dirname(dirname(__file__)), 'stuff')
+    _app_instance = None
 
     class Application(BaseApplication):
         class Root(Controller):
@@ -17,10 +18,12 @@ class WebTestCase(unittest.TestCase):
                 root=self.Root(),
             )
 
-    def create_test_app(self):
-        self.app = webtest.TestApp(self._app_instance)
+    @classmethod
+    def create_test_app(cls):
+        cls.app = webtest.TestApp(cls._app_instance)
 
-    def setUp(self):
-        self._app_instance = self.Application()
-        self._app_instance.configure(force=True)
-        self.create_test_app()
+    @classmethod
+    def setUpClass(cls):
+        cls._app_instance = cls.Application()
+        cls._app_instance.configure(force=True)
+        cls.create_test_app()

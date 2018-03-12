@@ -119,10 +119,7 @@ class TestCase(WebTestCase):
         self.app.get('/', status=200)
 
     def test_fail(self):
-        # Note: this should return 500, but on webtest
-        # exception raises before handling by nanohttp
-        with self.assertRaises(Exception):
-            self.app.get('/fail', status=500)
+        self.app.get('/fail', status=500)
 
     def test_all_sessions(self):
         resp = self.app.get('/all_sessions')

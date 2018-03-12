@@ -1,5 +1,13 @@
-from nanohttp import configure, Controller, Application as NanohttpApplication
 from os.path import abspath, join, dirname
+from nanohttp import (
+    configure,
+    Controller,
+    Application as NanohttpApplication,
+    HttpInternalServerError,
+    HttpStatus
+)
+from microhttp.exceptions import SqlError
+from sqlalchemy.exc import SQLAlchemyError
 
 
 class Application(NanohttpApplication):
@@ -51,3 +59,13 @@ logging:
     def prepare(cls):  # pragma: nocover
         """ Reserved for preparing the application """
         raise NotImplementedError
+
+    def _handle_exception(self, ex):
+        from microhttp.ext import log
+        if isinstance(ex, SQLAlchemyError):
+            ex = SqlError(ex)
+            log.exception(str(ex))
+        if not isinstance(ex, HttpStatus):
+            ex = HttpInternalServerError('Internal server error')
+            log.exception('Internal server error')
+        return super()._handle_exception(ex)
