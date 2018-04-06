@@ -43,6 +43,7 @@ def commit_all():
 def commit(func):
     """
     Commit Decorator
+    Try to commit all sessions and rollback them if have an exception.
     :param func:
     :return: 
     """
@@ -50,9 +51,13 @@ def commit(func):
     def wrapper(*args, **kwargs):
         try:
             result = func(*args, **kwargs)
-            commit_all()
+            for session_alias, session in bus.ext.db.sessions.items():
+                session.commit()
             return result
-        except exc.StatementError:
-            commit_all()
+
+        except Exception:
+            for session_alias, session in bus.ext.db.sessions.items():
+                session.rollback()
             raise
+
     return wrapper

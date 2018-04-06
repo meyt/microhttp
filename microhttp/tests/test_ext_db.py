@@ -4,7 +4,7 @@ import unittest
 from sqlalchemy import MetaData, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 
-from nanohttp import Controller, html, settings
+from nanohttp import Controller, html, settings, HttpBadRequest
 
 from microhttp import Application as BaseApplication
 from microhttp.ext import db
@@ -19,6 +19,7 @@ class Tag(DeclarativeBase):
     __tablename__ = 'tags'
     id = Column(Integer, primary_key=True, autoincrement=True)
     tag = Column(String(120), nullable=False, unique=True)
+    creator = Column(String(120), nullable=False)
 
 
 class TestCase(WebTestCase):
@@ -51,14 +52,39 @@ class TestCase(WebTestCase):
             @db.commit
             def fail(self):
                 db_session = db.get_session('db2')
-                metadata.create_all(bind=db_session.get_bind())
                 tag = Tag()
                 tag.tag = 'Book'
+                tag.creator = 'Writer'
                 db_session.add(tag)
 
                 tag = Tag()
                 tag.tag = 'Book'
+                tag.creator = 'Writer'
                 db_session.add(tag)
+                return ''
+
+            @html
+            def exception(self):
+                @db.commit
+                def run():
+                    db_session = db.get_session('db2')
+                    tag = Tag()
+                    db_session.add(tag)
+                    raise HttpBadRequest('Oh, dementors here!')
+                run()
+
+            @html
+            def just_commit(self):
+                db.commit_all()
+                db_session = db.get_session('db2')
+
+                try:
+                    tag = Tag()
+                    db_session.add(tag)
+                    db.commit_all()
+                except Exception:
+                    pass
+
                 return ''
 
             @html
@@ -85,9 +111,11 @@ class TestCase(WebTestCase):
                       name_or_url: 'sqlite:///%(microhttp_dir)s/tests/stuff/db2.db'
                       echo: false
                     session:
-                      autoflush: True
+                      autoflush: False
                       autocommit: False
                       expire_on_commit: True
+                      twophase: False
+
                   db3:
                     admin_db_url: 'mysql+pymysql://john:doe@somehost'
                     engine:
@@ -106,6 +134,7 @@ class TestCase(WebTestCase):
 
         with db.get_database_manager('db2') as manager:
             manager.create_database_if_not_exists()
+        metadata.create_all(bind=db.get_session('db2').get_bind())
 
     def tearDown(self):
         super().tearDown()
@@ -120,6 +149,10 @@ class TestCase(WebTestCase):
 
     def test_fail(self):
         self.app.get('/fail', status=500)
+
+    def test_exception(self):
+        self.app.get('/exception', status=400)
+        self.app.get('/just_commit', status=200)
 
     def test_all_sessions(self):
         resp = self.app.get('/all_sessions')
