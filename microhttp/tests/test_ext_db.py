@@ -4,7 +4,7 @@ import unittest
 from sqlalchemy import MetaData, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 
-from nanohttp import Controller, html, settings, HttpBadRequest
+from nanohttp import Controller, html, settings, HttpBadRequest, HttpStatus, context
 
 from microhttp import Application as BaseApplication
 from microhttp.ext import db
@@ -13,6 +13,15 @@ from microhttp.tests.helpers import WebTestCase
 
 metadata = MetaData()
 DeclarativeBase = declarative_base(metadata=metadata)
+
+
+class HttpNoContent(HttpStatus):
+    status = '204 No Content'
+
+    def render(self):
+        result = super().render()
+        context.response_content_type = None
+        return result
 
 
 class Tag(DeclarativeBase):
@@ -72,6 +81,23 @@ class TestCase(WebTestCase):
                     db_session.add(tag)
                     raise HttpBadRequest('Oh, dementors here!')
                 run()
+
+            @html
+            @db.commit
+            def http_success(self, fail: str=None):
+                db_session = db.get_session('db2')
+                tag = Tag()
+                tag.tag = 'Book2'
+                tag.creator = 'Writer2'
+                db_session.add(tag)
+
+                if fail is not None:
+                    tag = Tag()
+                    tag.tag = 'Book2'
+                    tag.creator = 'Writer2'
+                    db_session.add(tag)
+
+                raise HttpNoContent
 
             @html
             def just_commit(self):
@@ -153,6 +179,11 @@ class TestCase(WebTestCase):
     def test_exception(self):
         self.app.get('/exception', status=400)
         self.app.get('/just_commit', status=200)
+        # HTTP Success exceptions don't need to rollback
+        self.app.get('/http_success', status=204)
+        db.get_session('db2').query(Tag).filter_by(tag='Book2').one()
+
+        self.app.get('/http_success/fail', status=500)
 
     def test_all_sessions(self):
         resp = self.app.get('/all_sessions')

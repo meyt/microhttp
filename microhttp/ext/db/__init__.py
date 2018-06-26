@@ -1,10 +1,10 @@
 import functools
 from typing import Dict
 
-from sqlalchemy import create_engine, exc
+from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker, session as sa_session
 
-from nanohttp import settings
+from nanohttp import settings, HttpStatus
 
 from microhttp import bus
 from microhttp.ext.db.database_manager import DatabaseManager
@@ -47,17 +47,33 @@ def commit(func):
     :param func:
     :return: 
     """
+    def rollback_all_sessions():
+        for session_alias, session in bus.ext.db.sessions.items():
+            session.rollback()
+
+    def commit_all_sessions():
+        try:
+            for session_alias, session in bus.ext.db.sessions.items():
+                session.commit()
+
+        except Exception:
+            rollback_all_sessions()
+            raise
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
             result = func(*args, **kwargs)
-            for session_alias, session in bus.ext.db.sessions.items():
-                session.commit()
+            commit_all_sessions()
             return result
 
-        except Exception:
-            for session_alias, session in bus.ext.db.sessions.items():
-                session.rollback()
+        except HttpStatus as e:
+            # Commit for HTTP 2xx success statuses
+            if isinstance(e, HttpStatus) and (200 < int(e.status[:3]) < 300):
+                commit_all_sessions()
+                raise
+
+            rollback_all_sessions()
             raise
 
     return wrapper
