@@ -9,7 +9,7 @@ with open(join(dirname(__file__), 'microhttp', '__init__.py')) as v_file:
 
 
 dependencies = [
-    'nanohttp >= 0.13.0',
+    'nanohttp >= 0.29.0',
     'dogpile.cache',
     'sqlalchemy',
     'mako'
@@ -31,7 +31,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: POSIX :: Linux',
         'Operating System :: Unix',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Topic :: Software Development :: Libraries'
     ],
