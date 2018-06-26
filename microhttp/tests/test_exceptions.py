@@ -90,18 +90,15 @@ class TestCase(WebTestCase):
 
         # unique_violation
         resp = self.app.post('/?db_session=db2', params=dict(tag='test'), status=409)
-        self.assertEqual(resp.json['message'], 'unique_violation')
-        self.assertEqual(resp.headers['X-Reason'], '23505')
+        self.assertEqual(resp.status, '409 unique_violation')
 
         # not_null_violation
         resp = self.app.post('/?db_session=db2', status=400)
-        self.assertEqual(resp.json['message'], 'not_null_violation')
-        self.assertEqual(resp.headers['X-Reason'], '23502')
+        self.assertEqual(resp.status, '400 not_null_violation')
 
         # invalid_text_representation
         resp = self.app.post('/?db_session=db2&id=^', status=400)
-        self.assertEqual(resp.json['message'], 'invalid_text_representation')
-        self.assertEqual(resp.headers['X-Reason'], '22P02')
+        self.assertEqual(resp.status, '400 invalid_text_representation')
 
 
 if __name__ == '__main__':  # pragma: nocover

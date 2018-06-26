@@ -17,8 +17,7 @@ class SqlError(HttpStatus):
 
         error_code = ex.orig.pgcode
         status_text = cls.postgresql_errors.get(error_code)
-        return f'{cls.statuses.get(error_code, 500)} {status_text} ' \
-               f'{ex.orig.pgerror}'
+        return f'{cls.statuses.get(error_code, 500)} {status_text}'
 
     statuses = {
         '23502': 400,
