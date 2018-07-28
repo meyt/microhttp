@@ -18,8 +18,8 @@
         >>> _('HelloWorld')
     
 """
-
-from nanohttp import settings
+from typing import Union
+from nanohttp import settings, context
 from microhttp import bus
 from microhttp.ext import log
 import gettext
@@ -51,14 +51,27 @@ def set_locale(locale=None):
         log.exception('microhttp.ext.i18n: Locale error (%s)' % bus.ext.i18n.default)
 
 
+def set_locale_from_request(accepted_locales: Union[tuple, list]):
+    locale = (
+        str(context.environ['HTTP_ACCEPT_LANGUAGE'][:5]).lower()
+        if 'HTTP_ACCEPT_LANGUAGE' in context.environ else
+        None
+    )
+
+    if locale is None or locale not in accepted_locales:
+        locale = str(settings.i18n.default).lower()
+
+    language, region = locale[:2], locale[3:5]
+    set_locale('%s_%s' % (language, region.upper()))
+    context.response_headers['content-language'] = '%s-%s' % (language, region)
+
+
 def translate(word, plural=None, n=None) -> str:
     if bus.ext.i18n.default in bus.ext.i18n.locales_translation:
         if plural is not None:
             return bus.ext.i18n.locales_translation[bus.ext.i18n.default].ngettext(word, plural, n)
-        else:
-            return bus.ext.i18n.locales_translation[bus.ext.i18n.default].gettext(word)
-    else:
-        return word
+        return bus.ext.i18n.locales_translation[bus.ext.i18n.default].gettext(word)
+    return word
 
 
 _ = translate

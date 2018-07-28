@@ -27,6 +27,10 @@ class TestCase(WebTestCase):
         def __init__(self):
             super().__init__(self.Root())
 
+        @staticmethod
+        def begin_request():
+            i18n.set_locale_from_request(('fa-ir', 'en-us'))
+
         def configure(self, *args, **kwargs):
             super().configure(*args, **kwargs)
             settings.merge("""
@@ -42,6 +46,10 @@ class TestCase(WebTestCase):
 
     def test_default(self):
         resp = self.app.get('/', status=200)
+        self.assertEqual(resp.text, 'Hello World')
+
+        # If default locale not exist in defined locales
+        resp = self.app.get('/rr_rr', status=200)
         self.assertEqual(resp.text, 'Hello World')
 
     def test_en_us(self):
@@ -60,6 +68,19 @@ class TestCase(WebTestCase):
 
         resp = self.app.get('/plural/fa_IR/5', status=200)
         self.assertEqual(resp.text, 'اعلانات: 5')
+
+    def test_by_request(self):
+        # Set valid language in request header
+        resp = self.app.get('/', headers={
+            'accept-language': 'fa-ir'
+        }, status=200)
+        self.assertEqual(resp.text, 'سلام دنیا')
+
+        # Invalid locale, use default locale
+        resp = self.app.get('/', headers={
+            'accept-language': 'rr-rr'
+        }, status=200)
+        self.assertEqual(resp.text, 'Hello World')
 
 
 if __name__ == '__main__':  # pragma: nocover
