@@ -21,9 +21,11 @@
 from typing import Union
 from nanohttp import settings, context
 from microhttp import bus
-from microhttp.ext import log
+from microhttp.ext.log import get_logger
 import gettext
 import locale as lib_locale
+
+logger = get_logger('microhttp.ext.i18n')
 
 
 def configure():
@@ -48,7 +50,9 @@ def set_locale(locale=None):
     try:
         lib_locale.setlocale(lib_locale.LC_ALL, bus.ext.i18n.default)
     except lib_locale.Error:
-        log.warning('microhttp.ext.i18n: Locale error (%s)' % bus.ext.i18n.default)
+        logger.warning(
+            'microhttp.ext.i18n: Locale error (%s)' % bus.ext.i18n.default
+        )
 
 
 def set_locale_from_request(accepted_locales: Union[tuple, list]):
@@ -68,9 +72,10 @@ def set_locale_from_request(accepted_locales: Union[tuple, list]):
 
 def translate(word, plural=None, n=None) -> str:
     if bus.ext.i18n.default in bus.ext.i18n.locales_translation:
+        translation = bus.ext.i18n.locales_translation[bus.ext.i18n.default]
         if plural is not None:
-            return bus.ext.i18n.locales_translation[bus.ext.i18n.default].ngettext(word, plural, n)
-        return bus.ext.i18n.locales_translation[bus.ext.i18n.default].gettext(word)
+            return translation.ngettext(word, plural, n)
+        return translation.gettext(word)
     return word
 
 

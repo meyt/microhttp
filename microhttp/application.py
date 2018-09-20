@@ -1,4 +1,8 @@
+
 from os.path import abspath, join, dirname
+
+from sqlalchemy.exc import SQLAlchemyError
+
 from nanohttp import (
     configure,
     Controller,
@@ -6,8 +10,8 @@ from nanohttp import (
     HttpInternalServerError,
     HttpStatus
 )
+
 from microhttp.exceptions import SqlError
-from sqlalchemy.exc import SQLAlchemyError
 
 
 class Application(NanohttpApplication):
@@ -26,6 +30,11 @@ logging:
       level: DEBUG
 
   loggers:
+    microhttp:
+      handlers:
+      - console
+      level: DEBUG
+      
     main:
       handlers:
       - console
@@ -45,7 +54,12 @@ logging:
             _context.update(context)
 
         files = files or []
-        configure(init_value=self.builtin_configuration, context=_context, files=files, **kwargs)
+        configure(
+            init_value=self.builtin_configuration,
+            context=_context,
+            files=files,
+            **kwargs
+        )
         self.after_load_configuration()
         from microhttp.ext import log
         log.configure()
