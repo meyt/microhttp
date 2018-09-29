@@ -9,7 +9,7 @@ with open(join(dirname(__file__), 'microhttp', '__init__.py')) as v_file:
 
 
 dependencies = [
-    'nanohttp ~= 0.29.0',
+    'nanohttp ~= 1.9.11',
     'sqlalchemy',
     'mako'
 ]

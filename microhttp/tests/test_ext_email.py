@@ -1,7 +1,7 @@
 import mock
 import unittest
 from os.path import join
-from nanohttp import Controller, settings, html, context, HttpBadRequest
+from nanohttp import Controller, settings, html, context, HTTPBadRequest
 from microhttp import Application as BaseApplication
 from microhttp.ext import template, email
 from microhttp.tests.helpers import WebTestCase, SMTP
@@ -47,7 +47,7 @@ class EmailExtensionTestCase(WebTestCase):
                         e.send(**dict(context.form))
                         yield 'success'
                 except Exception:
-                    raise HttpBadRequest
+                    raise HTTPBadRequest
 
         def __init__(self):
             super().__init__(self.Root())

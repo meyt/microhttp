@@ -5,10 +5,11 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from nanohttp import (
     configure,
+    settings,
     Controller,
     Application as NanohttpApplication,
-    HttpInternalServerError,
-    HttpStatus
+    HTTPInternalServerError,
+    HTTPStatus
 )
 
 from microhttp.exceptions import SqlError
@@ -44,7 +45,7 @@ logging:
         super(Application, self).__init__(root=root)
         self.root_path = abspath(root_path)
 
-    def configure(self, files=None, context=None, **kwargs):
+    def configure(self, files=None, force=False, context=None, **kwargs):
         _context = {
             'root_path': self.root_path,
             'data_dir': join(self.root_path, 'data'),
@@ -55,11 +56,16 @@ logging:
 
         files = files or []
         configure(
-            init_value=self.builtin_configuration,
             context=_context,
-            files=files,
+            force=force,
             **kwargs
         )
+        settings.merge(self.builtin_configuration)
+
+        if files:
+            for f in files:
+                settings.load_files(f)
+
         self.after_load_configuration()
         from microhttp.ext import log
         log.configure()
@@ -74,12 +80,12 @@ logging:
         """ Reserved for preparing the application """
         raise NotImplementedError
 
-    def _handle_exception(self, ex):
+    def _handle_exception(self, ex, start_response):
         from microhttp.ext import log
         if isinstance(ex, SQLAlchemyError):
             ex = SqlError(ex)
             log.exception(str(ex))
-        if not isinstance(ex, HttpStatus):
-            ex = HttpInternalServerError('Internal server error')
+        if not isinstance(ex, HTTPStatus):
+            ex = HTTPInternalServerError('Internal server error')
             log.exception('Internal server error')
-        return super()._handle_exception(ex)
+        return super()._handle_exception(ex, start_response)

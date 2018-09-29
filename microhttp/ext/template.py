@@ -1,6 +1,6 @@
 from mako.lookup import TemplateLookup
 from mako import exceptions
-from nanohttp import action, settings, HttpInternalServerError
+from nanohttp import action, settings, HTTPInternalServerError
 from microhttp import bus
 from microhttp.ext import log
 import functools
@@ -29,11 +29,11 @@ class Template:
                     return exceptions.html_error_template().render().decode('utf-8')
                 except Exception:
                     log.exception('Template render exception - Debug Mode')
-                    raise HttpInternalServerError('Cannot locate template file (%s).' % filename)
+                    raise HTTPInternalServerError('Cannot locate template file (%s).' % filename)
             else:
                 log.exception('Template render exception')
                 import sys
-                raise HttpInternalServerError(sys.exc_info())
+                raise HTTPInternalServerError(sys.exc_info())
 
 
 def set_template(template_name):

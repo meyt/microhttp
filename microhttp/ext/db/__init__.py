@@ -4,7 +4,7 @@ from typing import Dict
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker, session as sa_session
 
-from nanohttp import settings, HttpStatus
+from nanohttp import settings, HTTPStatus
 
 from microhttp import bus
 from microhttp.ext.db.database_manager import DatabaseManager
@@ -67,9 +67,9 @@ def commit(func):
             commit_all_sessions()
             return result
 
-        except HttpStatus as e:
+        except HTTPStatus as e:
             # Commit for HTTP 2xx success statuses
-            if isinstance(e, HttpStatus) and (200 < int(e.status[:3]) < 300):
+            if isinstance(e, HTTPStatus) and (200 < int(e.status[:3]) < 300):
                 commit_all_sessions()
                 raise
 
