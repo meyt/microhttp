@@ -4,7 +4,7 @@ import unittest
 from sqlalchemy import MetaData, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 
-from nanohttp import Controller, html, settings, HttpBadRequest, HttpStatus, context
+from nanohttp import Controller, html, settings, HTTPBadRequest, HTTPStatus, context
 
 from microhttp import Application as BaseApplication
 from microhttp.ext import db
@@ -15,7 +15,7 @@ metadata = MetaData()
 DeclarativeBase = declarative_base(metadata=metadata)
 
 
-class HttpNoContent(HttpStatus):
+class HTTPNoContent(HTTPStatus):
     status = '204 No Content'
 
     def render(self):
@@ -79,7 +79,7 @@ class TestCase(WebTestCase):
                     db_session = db.get_session('db2')
                     tag = Tag()
                     db_session.add(tag)
-                    raise HttpBadRequest('Oh, dementors here!')
+                    raise HTTPBadRequest('Oh, dementors here!')
                 run()
 
             @html
@@ -97,7 +97,7 @@ class TestCase(WebTestCase):
                     tag.creator = 'Writer2'
                     db_session.add(tag)
 
-                raise HttpNoContent
+                raise HTTPNoContent
 
             @html
             def just_commit(self):

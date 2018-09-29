@@ -1,11 +1,11 @@
-from nanohttp import HttpStatus
+from nanohttp import HTTPStatus
 
 
 class MicrohttpException(Exception):
     pass
 
 
-class SqlError(HttpStatus):
+class SqlError(HTTPStatus):
 
     def __init__(self, sqlalchemy_error):
         super().__init__(self.map_exception(sqlalchemy_error))
