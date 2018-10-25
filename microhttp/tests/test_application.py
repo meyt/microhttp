@@ -1,5 +1,7 @@
 import unittest
 
+from os.path import join
+
 from nanohttp import Controller, html
 
 from microhttp import Application as BaseApplication
@@ -28,6 +30,10 @@ class TestCase(WebTestCase):
 
     def test_simple(self):
         self.app.get('/', status=200)
+
+    def test_configuration_files(self):
+        app = self.Application()
+        app.configure(files=[join(self.stuff_dir, 'sample-config.yaml')], force=True)
 
 
 if __name__ == '__main__':  # pragma: nocover

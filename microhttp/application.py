@@ -64,7 +64,7 @@ logging:
 
         if files:
             for f in files:
-                settings.load_files(f)
+                settings.load_file(f)
 
         self.after_load_configuration()
         from microhttp.ext import log
