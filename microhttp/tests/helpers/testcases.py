@@ -20,7 +20,7 @@ class WebTestCase(unittest.TestCase):
 
     @classmethod
     def create_test_app(cls):
-        cls.app = webtest.TestApp(cls._app_instance)
+        cls.app = webtest.TestApp(cls._app_instance, lint=False)
 
     @classmethod
     def setUpClass(cls):
