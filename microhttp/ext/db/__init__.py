@@ -4,7 +4,7 @@ from typing import Dict
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker, session as sa_session
 
-from nanohttp import settings, HTTPStatus
+from nanohttp import settings, HTTPStatus, context
 
 from microhttp import bus
 from microhttp.ext.db.database_manager import DatabaseManager
@@ -62,6 +62,10 @@ def commit(func):
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
+
+        if hasattr(context, 'suppress_db_commit'):
+            return func(*args, **kwargs)
+
         try:
             result = func(*args, **kwargs)
             commit_all_sessions()

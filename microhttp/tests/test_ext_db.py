@@ -50,15 +50,6 @@ class TestCase(WebTestCase):
 
             @html
             @db.commit
-            def new(self):
-                db_session = db.get_session('db2')
-                db_session.execute("""
-                    CREATE TABLE BOOKS ( title TEXT NOT NULL, publication_date TEXT)
-                """)
-                return ''
-
-            @html
-            @db.commit
             def fail(self):
                 db_session = db.get_session('db2')
                 tag = Tag()
@@ -84,19 +75,12 @@ class TestCase(WebTestCase):
 
             @html
             @db.commit
-            def http_success(self, fail: str=None):
+            def new_tag(self):
                 db_session = db.get_session('db2')
                 tag = Tag()
-                tag.tag = 'Book2'
-                tag.creator = 'Writer2'
+                tag.tag = context.form.get('tag')
+                tag.creator = context.form.get('creator')
                 db_session.add(tag)
-
-                if fail is not None:
-                    tag = Tag()
-                    tag.tag = 'Book2'
-                    tag.creator = 'Writer2'
-                    db_session.add(tag)
-
                 raise HTTPNoContent
 
             @html
@@ -112,6 +96,11 @@ class TestCase(WebTestCase):
                     pass
 
                 return ''
+
+            @html
+            def suppress_commit(self):
+                context.suppress_db_commit = True
+                self.new_tag()
 
             @html
             def all_sessions(self):
@@ -180,10 +169,15 @@ class TestCase(WebTestCase):
         self.app.get('/exception', status=400)
         self.app.get('/just_commit', status=200)
         # HTTP Success exceptions don't need to rollback
-        self.app.get('/http_success', status=204)
+        self.app.get('/new_tag?tag=Book2&creator=Writer2', status=204)
         db.get_session('db2').query(Tag).filter_by(tag='Book2').one()
 
-        self.app.get('/http_success/fail', status=500)
+        # self.app.get('/new_tag/fail', status=500)
+        self.app.get('/suppress_commit?tag=Book3&creator=Writer2')
+        self.assertEqual(
+            db.get_session('db2').query(Tag).filter_by(tag='Book3').first(),
+            None
+        )
 
     def test_all_sessions(self):
         resp = self.app.get('/all_sessions')
@@ -192,9 +186,6 @@ class TestCase(WebTestCase):
 
     def test_another_database(self):
         self.app.get('/db2', status=200)
-
-    def test_new(self):
-        self.app.get('/new', status=200)
 
     @mock.patch('microhttp.ext.db.database_manager.create_engine')
     def test_database_manager(self, *_):
