@@ -7,3 +7,4 @@ __pycache__/
 microhttp/tests/stuff/*.dbm
 microhttp/tests/stuff/*.dbm.rw.lock
 venv/
+practice/
