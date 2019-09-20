@@ -1,7 +1,7 @@
-nose
+pytest
+pytest-cov
 mock
 webtest
-coverage
 coveralls
 pymysql
 psycopg2

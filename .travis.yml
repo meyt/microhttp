@@ -1,13 +1,20 @@
 language: python
 
+services:
+  - postgresql
+  - mysql
+
 python:
   - 3.6
 
 before_install:
   - pip install -U pip setuptools wheel
   - pip install -r requirements-dev.txt
+  - pip install --upgrade pytest
 
 install: pip install -ve .
-script: coverage run --source microhttp $(which nosetests)
+
+script: py.test -vv --cov-report term-missing:skip-covered --cov=microhttp microhttp
+
 after_success: if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then travis_retry coveralls
   ; fi
