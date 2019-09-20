@@ -4,8 +4,6 @@ from pytest import fixture
 
 from webtest import TestApp
 
-from nanohttp import Controller
-
 from microhttp import Application
 
 

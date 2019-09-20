@@ -1,5 +1,5 @@
-
 import os
+
 from os.path import exists
 from urllib.parse import urlparse
 
@@ -13,21 +13,21 @@ class AbstractDatabaseManager(object):
 
     def __init__(self, session_spec):
         self.db_url = session_spec.engine.name_or_url
-        self.db_name = urlparse(self.db_url).path.lstrip('/')
+        self.db_name = urlparse(self.db_url).path.lstrip("/")
         # For databases does not require (or have) any administrative system
-        if hasattr(session_spec, 'admin_db_url'):
+        if hasattr(session_spec, "admin_db_url"):
             self.admin_url = session_spec.admin_db_url
-            self.admin_db_name = urlparse(self.admin_url).path.lstrip('/')
+            self.admin_db_name = urlparse(self.admin_url).path.lstrip("/")
 
     def __enter__(self):
-        if hasattr(self, 'admin_url'):
+        if hasattr(self, "admin_url"):
             self.engine = create_engine(self.admin_url)
             self.connection = self.engine.connect()
-            self.connection.execute('commit')
+            self.connection.execute("commit")
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if hasattr(self, 'admin_url'):
+        if hasattr(self, "admin_url"):
             self.connection.close()
             self.engine.dispose()
 
@@ -46,17 +46,17 @@ class AbstractDatabaseManager(object):
 
 
 class MysqlManager(AbstractDatabaseManager):
-    """ 
-    MySQL database manager 
+    """
+    MySQL database manager
     """
 
     def __enter__(self):
         super().__enter__()
-        self.connection.execute('commit')
+        self.connection.execute("commit")
         return self
 
     def database_exists(self):
-        r = self.connection.execute('SHOW DATABASES LIKE \'%s\'' % self.db_name)
+        r = self.connection.execute("SHOW DATABASES LIKE '%s'" % self.db_name)
         try:
             ret = r.cursor.fetchall()
             return len(ret) > 0
@@ -64,26 +64,28 @@ class MysqlManager(AbstractDatabaseManager):
             r.cursor.close()
 
     def create_database(self):
-        self.connection.execute('CREATE DATABASE %s' % self.db_name)
-        self.connection.execute('commit')
+        self.connection.execute("CREATE DATABASE %s" % self.db_name)
+        self.connection.execute("commit")
 
     def drop_database(self):
-        self.connection.execute('DROP DATABASE IF EXISTS %s' % self.db_name)
-        self.connection.execute('commit')
+        self.connection.execute("DROP DATABASE IF EXISTS %s" % self.db_name)
+        self.connection.execute("commit")
 
 
 class PostgresManager(AbstractDatabaseManager):
-    """ 
-    Postgres database manager 
+    """
+    Postgres database manager
     """
 
     def __enter__(self):
         super().__enter__()
-        self.connection.execute('commit')
+        self.connection.execute("commit")
         return self
 
     def database_exists(self):
-        r = self.connection.execute('SELECT 1 FROM pg_database WHERE datname = \'%s\'' % self.db_name)
+        r = self.connection.execute(
+            "SELECT 1 FROM pg_database WHERE datname = '%s'" % self.db_name
+        )
         try:
             ret = r.cursor.fetchall()
             return ret
@@ -91,52 +93,54 @@ class PostgresManager(AbstractDatabaseManager):
             r.cursor.close()
 
     def create_database(self):
-        self.connection.execute('CREATE DATABASE %s' % self.db_name)
-        self.connection.execute('commit')
+        self.connection.execute("CREATE DATABASE %s" % self.db_name)
+        self.connection.execute("commit")
 
     def drop_database(self):
-        self.connection.execute('DROP DATABASE IF EXISTS %s' % self.db_name)
-        self.connection.execute('commit')
+        self.connection.execute("DROP DATABASE IF EXISTS %s" % self.db_name)
+        self.connection.execute("commit")
 
 
 class SqliteManager(AbstractDatabaseManager):
-    """ 
+    """
     SQLite database manager
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.filename = self.db_url.replace('sqlite:///', '')
+        self.filename = self.db_url.replace("sqlite:///", "")
 
     def database_exists(self):
         return exists(self.filename)
 
     def create_database(self):
         if self.database_exists():
-            raise RuntimeError('The file is already exists: %s' % self.filename)
-        print('Creating: %s' % self.filename)
-        open(self.filename, 'a').close()
+            raise RuntimeError(
+                "The file is already exists: %s" % self.filename
+            )
+        print("Creating: %s" % self.filename)
+        open(self.filename, "a").close()
 
     def drop_database(self):
-        print('Removing: %s' % self.filename)
+        print("Removing: %s" % self.filename)
         os.remove(self.filename)
 
 
 # noinspection PyAbstractClass
 class DatabaseManager(AbstractDatabaseManager):
-    """ 
+    """
     Some operations to manage database (inside of database system).
     """
 
     def __new__(cls, session_spec):
         url = session_spec.engine.name_or_url
-        if url.startswith('sqlite'):
+        if url.startswith("sqlite"):
             manager_class = SqliteManager
-        elif url.startswith('postgres'):
+        elif url.startswith("postgres"):
             manager_class = PostgresManager
-        elif url.startswith('mysql'):
+        elif url.startswith("mysql"):
             manager_class = MysqlManager
         else:
-            raise ValueError('Unsupported database uri: %s' % url)
+            raise ValueError("Unsupported database uri: %s" % url)
 
         return manager_class(session_spec=session_spec)

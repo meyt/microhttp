@@ -13,21 +13,27 @@ from microhttp.ext.db.database_manager import DatabaseManager
 def configure():
     bus.ext.db.sessions = {}
     for session_alias, session_spec in settings.sqlalchemy.items():
-        sa_engine = create_engine(**session_spec['engine'])
-        session_kwargs = dict(session_spec['session']) if 'session' in session_spec else dict()
-        session_kwargs['bind'] = sa_engine
-        bus.ext.db.sessions[session_alias] = scoped_session(sessionmaker(**session_kwargs))
+        sa_engine = create_engine(**session_spec["engine"])
+        session_kwargs = (
+            dict(session_spec["session"])
+            if "session" in session_spec
+            else dict()
+        )
+        session_kwargs["bind"] = sa_engine
+        bus.ext.db.sessions[session_alias] = scoped_session(
+            sessionmaker(**session_kwargs)
+        )
 
 
 def get_sessions() -> Dict[str, sa_session.Session]:
     return bus.ext.db.sessions
 
 
-def get_session(session_alias: str='default') -> sa_session.Session:
+def get_session(session_alias: str = "default") -> sa_session.Session:
     return bus.ext.db.sessions[session_alias]
 
 
-def get_database_manager(session_alias: str='default') -> DatabaseManager:
+def get_database_manager(session_alias: str = "default") -> DatabaseManager:
     return DatabaseManager(settings.sqlalchemy[session_alias])
 
 
@@ -45,8 +51,9 @@ def commit(func):
     Commit Decorator
     Try to commit all sessions and rollback them if have an exception.
     :param func:
-    :return: 
+    :return:
     """
+
     def rollback_all_sessions():
         for session_alias, session in bus.ext.db.sessions.items():
             session.rollback()
@@ -63,7 +70,7 @@ def commit(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
 
-        if hasattr(context, 'suppress_db_commit'):
+        if hasattr(context, "suppress_db_commit"):
             return func(*args, **kwargs)
 
         try:

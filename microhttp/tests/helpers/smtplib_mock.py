@@ -1,5 +1,3 @@
-
-
 class Message:  # pragma:nocover
     def __init__(self, from_address, to_address, fullmessage, **kwargs):
         self.from_address = from_address
@@ -8,7 +6,7 @@ class Message:  # pragma:nocover
 
 
 class SMTP:  # pragma:nocover
-    __slots__ = ('inbox', 'username', 'password', 'has_quit',)
+    __slots__ = ("inbox", "username", "password", "has_quit")
 
     def __init__(self, *args, **kwargs):
         pass

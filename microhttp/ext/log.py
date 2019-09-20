@@ -8,7 +8,7 @@ def configure():
     dictConfig(dict(settings.logging))
 
 
-def get_logger(logger_name: str = 'main') -> Logger:
+def get_logger(logger_name: str = "main") -> Logger:
     return getLogger(logger_name)
 
 

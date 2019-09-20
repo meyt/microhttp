@@ -1,4 +1,3 @@
-
 from os.path import abspath, join, dirname
 
 from sqlalchemy.exc import SQLAlchemyError
@@ -9,7 +8,7 @@ from nanohttp import (
     Controller,
     Application as NanohttpApplication,
     HTTPInternalServerError,
-    HTTPStatus
+    HTTPStatus,
 )
 
 from microhttp.exceptions import SqlError
@@ -35,31 +34,27 @@ logging:
       handlers:
       - console
       level: DEBUG
-      
+
     main:
       handlers:
       - console
       level: DEBUG    """
 
-    def __init__(self, root: Controller=None, root_path: str='.'):
+    def __init__(self, root: Controller = None, root_path: str = "."):
         super(Application, self).__init__(root=root)
         self.root_path = abspath(root_path)
 
     def configure(self, files=None, force=False, context=None, **kwargs):
         _context = {
-            'root_path': self.root_path,
-            'data_dir': join(self.root_path, 'data'),
-            'microhttp_dir': abspath(dirname(__file__))
+            "root_path": self.root_path,
+            "data_dir": join(self.root_path, "data"),
+            "microhttp_dir": abspath(dirname(__file__)),
         }
         if context:
             _context.update(context)
 
         files = files or []
-        configure(
-            context=_context,
-            force=force,
-            **kwargs
-        )
+        configure(context=_context, force=force, **kwargs)
         settings.merge(self.builtin_configuration)
 
         if files:
@@ -68,6 +63,7 @@ logging:
 
         self.after_load_configuration()
         from microhttp.ext import log
+
         log.configure()
 
     # noinspection PyMethodMayBeStatic
@@ -82,10 +78,11 @@ logging:
 
     def _handle_exception(self, ex, start_response):
         from microhttp.ext import log
+
         if isinstance(ex, SQLAlchemyError):
             ex = SqlError(ex)
             log.exception(str(ex))
         if not isinstance(ex, HTTPStatus):
-            ex = HTTPInternalServerError('Internal server error')
-            log.exception('Internal server error')
+            ex = HTTPInternalServerError("Internal server error")
+            log.exception("Internal server error")
         return super()._handle_exception(ex, start_response)
