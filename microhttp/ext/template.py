@@ -24,16 +24,11 @@ class Template:
             return self._lookup.get_template(filename).render(**data)
         except Exception:
             if settings.debug:
-                # noinspection PyBroadException
-                try:
-                    return exceptions.html_error_template().render().decode('utf-8')
-                except Exception:
-                    log.exception('Template render exception - Debug Mode')
-                    raise HTTPInternalServerError('Cannot locate template file (%s).' % filename)
-            else:
-                log.exception('Template render exception')
-                import sys
-                raise HTTPInternalServerError(sys.exc_info())
+                return exceptions.html_error_template().render().decode('utf-8')
+
+            log.exception('Template render exception')
+            import sys
+            raise HTTPInternalServerError(sys.exc_info())
 
 
 def set_template(template_name):
