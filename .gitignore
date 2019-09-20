@@ -8,3 +8,4 @@ microhttp/tests/stuff/*.dbm
 microhttp/tests/stuff/*.dbm.rw.lock
 venv/
 practice/
+.vscode
