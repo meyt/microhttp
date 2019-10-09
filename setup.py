@@ -1,9 +1,5 @@
-import re
-
-from os.path import join, dirname
 from setuptools import setup, find_packages
 
-package_name = "microhttp"
 dependencies = [
     "nanohttp ~= 1.10.1",
     "pymlconf == 1.2.*",
@@ -12,18 +8,17 @@ dependencies = [
 ]
 
 
-# reading package version (without reloading it)
-with open(join(dirname(__file__), package_name, "__init__.py")) as v_file:
-    package_version = (
-        re.compile(r".*__version__ = '(.*?)'", re.S)
-        .match(v_file.read())
-        .group(1)
-    )
+def read_version(module_name):
+    from re import match, S
+    from os.path import join, dirname
+
+    with open(join(dirname(__file__), module_name, "__init__.py")) as f:
+        return match(r".*__version__.*('|\")(.*?)('|\")", f.read(), S).group(2)
 
 
 setup(
-    name=package_name,
-    version=package_version,
+    name="microhttp",
+    version=read_version("microhttp"),
     description="A tool-chain for creating web application based on nanohttp",
     long_description=open("README.rst").read(),
     url="http://github.com/meyt/microhttp",
