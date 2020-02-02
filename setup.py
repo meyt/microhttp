@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 dependencies = [
-    "nanohttp ~= 1.10.1",
+    "nanohttp == 1.11.1",
     "pymlconf == 1.2.*",
     "sqlalchemy",
     "mako",
