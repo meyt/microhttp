@@ -66,6 +66,10 @@ logging:
 
         log.configure()
 
+    def end_response(self):
+        from microhttp.ext import db
+        db.remove_all()
+
     # noinspection PyMethodMayBeStatic
     def after_load_configuration(self):  # pragma: nocover
         """ A hook called after configurations load """

@@ -38,13 +38,16 @@ def get_database_manager(session_alias: str = "default") -> DatabaseManager:
 
 
 def commit_all():
-    for session_alias, session in bus.ext.db.sessions.items():
+    for session in bus.ext.db.sessions.values():
         try:
             session.commit()
         except Exception:
             session.rollback()
             raise
 
+def remove_all():
+    for session in bus.ext.db.sessions.values():
+        session.remove()
 
 def commit(func):
     """
@@ -55,12 +58,12 @@ def commit(func):
     """
 
     def rollback_all_sessions():
-        for session_alias, session in bus.ext.db.sessions.items():
+        for session in bus.ext.db.sessions.values():
             session.rollback()
 
     def commit_all_sessions():
         try:
-            for session_alias, session in bus.ext.db.sessions.items():
+            for session in bus.ext.db.sessions.values():
                 session.commit()
 
         except Exception:
